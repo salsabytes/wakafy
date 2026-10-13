@@ -1,0 +1,9 @@
+# dependencies
+node_modules/
+
+# editor / OS noise
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db

@@ -30,8 +30,15 @@ function main(input) {
 `wakafy.send(object)` answers JSON — simple, right?
 (The old `return {...}` style from `main` still works.)
 
-Then publish: open the **Publish** tab in the dashboard, fill the form
-from `waka.json`, paste `index.js` into the editor, publish. Instantly live
+Then publish, two ways:
+
+- **Import (today):** open the **Publish** tab in the dashboard, click
+  *Impor waka.json + index.js*, select both files — the form fills itself
+  from `waka.json`, then hit Publish.
+- **Paste (manual):** fill the form from `waka.json`, paste `index.js`
+  into the editor, publish.
+
+Either way it is instantly live
 at `/username/id` + endpoint `/v1/ext/username/id`.
 
 ## Runtime API (on the server sandbox)

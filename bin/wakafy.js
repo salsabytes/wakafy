@@ -10,13 +10,13 @@ const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
 const HELP = `wakafy v${pkg.version} — module + CLI for the wakafy.store plugin repository
 
 usage:
-  wakafy init [folder] [--force]   scaffold waka.json + index.js starter
+  wakafy init [folder] [--force]   scaffold a repo (package.json, waka.json, index.js)
   wakafy --help                    show this help
   wakafy --version                 show the version
 
 example:
   wakafy init hello-friend
-  cd hello-friend && edit waka.json + index.js however you like
+  cd hello-friend && npm install && add files freely
 `;
 
 function fail(msg) {
@@ -43,7 +43,7 @@ if (cmd === 'init') {
     const r = init(dir || '.', { force });
     for (const f of r.created) process.stdout.write(`create ${f}\n`);
     for (const f of r.skipped) process.stdout.write(`skip ${f} (already exists)\n`);
-    process.stdout.write(`\nready in ${r.dir}\nedit waka.json (title, description, category) + index.js however you like.\n`);
+    process.stdout.write(`\nready in ${r.dir}\nnpm install to test locally, then set "main" in waka.json to the entry file.\n`);
   } catch (e) {
     fail(e.message);
   }

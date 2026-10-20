@@ -1,8 +1,8 @@
 # wakafy — module + CLI for the plugin repository
 
-A wakafy plugin is a **small repo**: multiple files, `waka.json` as config,
-`index.js` as entry, later `package.json` too. Free like a real repo —
-but running on the `wakafy` module.
+A wakafy plugin is a **small repo**: `init` seeds it with `package.json`,
+`waka.json`, and `index.js`, then you add files freely — any names you like.
+`main` in the config points at the file that gets executed.
 
 ## Usage (today)
 
@@ -10,32 +10,44 @@ but running on the `wakafy` module.
 npx wakafy init hello-friend   # once published to npm; for now from this folder:
 node bin/wakafy.js init hello-friend
 cd hello-friend
+npm install                    # pulls the wakafy package for local testing
 ```
 
-`init` creates two files:
+`init` creates three files:
 
-- **`waka.json`** — title, description, category, method, entry, params.
+- **`package.json`** — ESM project metadata with `wakafy` as a dependency
+  (`^1.0.0`), so the starter runs locally after `npm install`.
+- **`waka.json`** — title, description, category, method, main, params.
   Edit it freely, later read by `wakafy publish`.
-- **`index.js`** — your code. One contract: `function main(input)`
-  and answer with **`wakafy.send(...)`**:
+- **`index.js`** — starter entry file exporting `function main(input)`.
+
+Then keep adding files, e.g. `lib/util.js`. One contract: `function main(input)`
+and answer with **`wakafy.send(...)`**:
 
 ```js
+const greeting = require('./greeting.js');
+
 function main(input) {
-  const name = String(input.name || 'friend');
-  wakafy.send({ greeting: 'Hello, ' + name + '!' });
+  wakafy.send({ greeting: greeting(String(input.name || 'friend')) });
 }
+```
+
+```js
+module.exports = (name) => 'Hello, ' + name + '!';
 ```
 
 `input` = caller query/body (`?name=ana` becomes `input.name`).
 `wakafy.send(object)` answers JSON — simple, right?
 (The old `return {...}` style from `main` still works.)
+`require()` loads your own repo files (relative only, max 20 files).
 
 Then publish, two ways:
 
 - **Import (today):** open the **Publish** tab in the dashboard, click
-  *Impor waka.json + index.js*, select both files — the form fills itself
-  from `waka.json`, then hit Publish.
-- **Paste (manual):** fill the form from `waka.json`, paste `index.js`
+  *Import waka.json + files*, select the repo files — the form fills itself
+  from `waka.json`, then hit Publish. Manage files per plugin afterwards
+  from the same tab.
+- **Paste (manual):** fill the form from `waka.json`, paste the entry file
   into the editor, publish.
 
 Either way it is instantly live
@@ -49,9 +61,10 @@ at `/username/id` + endpoint `/v1/ext/username/id`.
 | `wakafy.send(json)` | answer JSON (last call wins) |
 | `wakafy.version` | engine version, e.g. `"1"` |
 | `console.log(...)` | no-op (keeps examples from crashing) |
+| `require(path)` | load your own repo files (`./util`, `./util.js`) |
 
-Limits: 32 KB source, 5 s run, 256 KB output. No network/disk
-(no `fetch`/`require`/`process` — pure compute).
+Limits: 32 KB per file, 20 files, 5 s run, 256 KB output. No network/disk
+(no `fetch`/`process` — pure compute over your own files).
 
 ## `waka.json` schema (engine `wakafy/1`)
 
@@ -63,7 +76,7 @@ Limits: 32 KB source, 5 s run, 256 KB output. No network/disk
   "description": "...",
   "category": "Community",
   "method": "GET",           // GET or POST
-  "entry": "index.js",
+  "main": "index.js",        // entry file that gets executed
   "params": [
     { "name": "name", "required": false, "placeholder": "ana" }
   ]
@@ -73,6 +86,5 @@ Limits: 32 KB source, 5 s run, 256 KB output. No network/disk
 ## Roadmap (coming up)
 
 - `wakafy publish` — ship the repo straight from the terminal, no paste.
-- multi-file + `package.json` — `require` across your own files.
 - file/folder upload — static assets per plugin.
 - `wakafy dev` — run locally before publishing.

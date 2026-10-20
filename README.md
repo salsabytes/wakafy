@@ -1,28 +1,39 @@
 # wakafy — module + CLI for the plugin repository
 
-A wakafy plugin is a **small repo**: `init` seeds it with `package.json`,
-`waka.json`, and `index.js`, then you add files freely — any names you like.
-`main` in the config points at the file that gets executed.
+A wakafy plugin is a **small repo**: `init` seeds it with the starter files
+for Node.js or Go, then you add files freely — any names you like. `main` in
+the config points at the file that gets executed.
 
 ## Usage (today)
 
 ```sh
-npx wakafy init hello-friend   # once published to npm; for now from this folder:
+npx wakafy init hello-friend        # Node.js (default)
+npx wakafy init hello-go --go       # Golang
+# once published to npm; for now from this folder:
 node bin/wakafy.js init hello-friend
 cd hello-friend
-npm install                    # pulls the wakafy package for local testing
+npm install                         # Node only: pulls wakafy for local testing
 ```
 
-`init` creates three files:
+Node.js `init` creates:
 
 - **`package.json`** — ESM project metadata with `wakafy` as a dependency
   (`^1.0.0`), so the starter runs locally after `npm install`.
 - **`waka.json`** — title, description, category, method, main, params.
   Edit it freely, later read by `wakafy publish`.
-- **`index.js`** — starter entry file exporting `function main(input)`.
+- **`index.js`** — ESM starter with an explicit `import wakafy from 'wakafy'`
+  and `export default async function handler(input)`.
 
-Then keep adding files, e.g. `lib/util.js`. One contract: `function main(input)`
-and answer with **`wakafy.send(...)`**:
+Golang `init` creates:
+
+- **`go.mod`** — module metadata.
+- **`waka.json`** — engine `wakafy/go-1`, main `main.go`.
+- **`main.go`** — `func Handle(input map[string]any) (any, error)` with no
+  hidden globals; input is the parameter and the result is the return value.
+
+Then keep adding files, e.g. `lib/util.js`. For Node one contract:
+`function main(input)` / `export default async function handler(input)` and
+answer with the returned object or **`wakafy.send(...)`**:
 
 ```js
 const greeting = require('./greeting.js');
@@ -82,6 +93,10 @@ Limits: 32 KB per file, 20 files, 5 s run, 256 KB output. No network/disk
   ]
 }
 ```
+
+For Go, use engine `wakafy/go-1` and point `main` at `main.go`. The handler
+contract is `func Handle(input map[string]any) (any, error)`; imports are
+limited to the safe stdlib subset (no filesystem/network/process).
 
 ## Roadmap (coming up)
 

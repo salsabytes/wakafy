@@ -12,17 +12,16 @@ npx wakafy init hello-go --go       # Golang
 # once published to npm; for now from this folder:
 node bin/wakafy.js init hello-friend
 cd hello-friend
-npm install                         # Node only: pulls wakafy for local testing
 ```
 
 Node.js `init` creates:
 
-- **`package.json`** — ESM project metadata with `wakafy` as a dependency
-  (`^1.0.0`), so the starter runs locally after `npm install`.
+- **`package.json`** — ESM project metadata. The starter has no runtime
+  dependency; add npm packages here only when your crate needs them.
 - **`waka.json`** — title, description, category, method, main, params.
   Edit it freely, later read by `wakafy publish`.
-- **`index.js`** — ESM starter with an explicit `import wakafy from 'wakafy'`
-  and `export default async function handler(input)`.
+- **`index.js`** — minimal ESM starter with
+  `export default async function main(input)` and no helper import.
 
 Golang `init` creates:
 
@@ -32,7 +31,7 @@ Golang `init` creates:
   hidden globals; input is the parameter and the result is the return value.
 
 Then keep adding files, e.g. `lib/util.js`. For Node one contract:
-`function main(input)` / `export default async function handler(input)` and
+`function main(input)` / `export default async function main(input)` and
 answer with the returned object or **`wakafy.send(...)`**:
 
 ```js
